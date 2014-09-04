@@ -6,7 +6,7 @@ print '<html>'
 print '<head>'
 print '<title>Streamscape Web IM</title>'
 print '<script language="javascript" type="text/javascript" src="../lib/jquery-1.7.2.min.js"></script>'
-print "<script language='javascript' type='text/javascript' src='../lib/web_chat.js'></script>"
+print "<script language='javascript' type='text/javascript' src='lib/web_chat.js'></script>"
 print '<script language="javascript" type="text/javascript" src="../lib/spin.js"></script>'
 print '</head>'
 print "<body  onunload='unload()'>"
@@ -27,7 +27,7 @@ print "</tr><tr>"
 print "<td><button type='button' onclick='clear_history()'>Clear History</button></td>"
 print "</tr>"
 print "</table>"
-os.system('./cgi-bin/chat_server.py &')
+os.system('/usr/local/cgi-bin/web_im/chat_server.py &')
 print '</body>'
 print '</html>'
 

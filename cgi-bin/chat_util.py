@@ -6,17 +6,18 @@ import socket
 import sys
 import os
 import cgi, cgitb
+import math
 
 def idToIP(id):
-   ip = '172.20.'
-   msb = math.floor(int(id)/256)
-   lsb = int(id) - msb * 256
-   ip = ip + msb + lsb
+   ip = "172.20."
+   msb = int(math.floor(int(id)/256))
+   lsb = int(int(id) - msb * 256)
+   ip = ip + str(msb) + str(lsb)
    return ip
 
 HISTORY_PATH='/tmp/mnt/im_history'
 f = open('/dev/shm/radio/nodeid','r')
-NODEID = f.read()
+NODEID = f.read().splitlines()[0]
 f.close()
 NODEIP = idToIP(NODEID)
 
@@ -126,9 +127,7 @@ if __name__ == "__main__":
     if cmd == "send_msg":
         message = form.getvalue('msg')
         remote_ip = form.getvalue('remote_ip')
-        node_ip = form.getvalue('node_ip')
-        node_id = form.getvalue('node_id')
-        send_message(message, remote_ip, node_ip, node_id)
+        send_message(message, remote_ip)
     elif cmd == "close_chat":
         close_chat()
     elif cmd == "connect_remote":
