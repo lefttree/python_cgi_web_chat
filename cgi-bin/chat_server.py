@@ -5,13 +5,10 @@ import sys
 import os
 from thread import *
 
-'''
-f = open('text', 'w')
-f.write(os.environ.get('QUERY_STRING'))
-f.close()
-'''
+HISTORY_PATH='/tmp/mnt/im_history'
+
 HOST = ''
-PORT = 8888
+PORT = 3721
 
 try:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -36,6 +33,7 @@ print "Socket now listening"
 
 #Function for handling connections. This will be used to create threads
 def clientthread(conn):
+    global HISTORY_PATH
     #sending message to connected client
     conn.send('Welcome to the server. Type something and hit enter\n')# send() only takes string
 
@@ -45,8 +43,12 @@ def clientthread(conn):
         reply = "OK..." + data
         if not data:
             break
-        f = open('text', 'a')
-        message = "<p>" + data + "</p>"
+        if not os.path.exists(HISTORY_PATH):
+            os.makedirs(HISTORY_PATH)
+        node_id = data.split(':')[0].split('(')[0]
+        history_file = HISTORY_PATH + "/" + node_id
+        f = open(history_file, 'a')
+        data = "<p>" + data + "</p>"
         f.write(data)
         f.close()
 

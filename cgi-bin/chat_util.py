@@ -7,11 +7,13 @@ import sys
 import os
 import cgi, cgitb
 
+HISTORY_PATH='/tmp/mnt/im_history'
+
 form = cgi.FieldStorage()
 
 cmd = form.getvalue('cmd')
 
-def send_message(message, remote_ip):
+def send_message(message, remote_ip, node_ip, node_id):
     
     #create an AF_INET, STREAM socket(TCP)
     try:
@@ -23,7 +25,7 @@ def send_message(message, remote_ip):
     print "Socket Created"
     
     host = remote_ip
-    port = 8888
+    port = 3721
     
     try:
         remote_ip = socket.gethostbyname(host)
@@ -40,6 +42,8 @@ def send_message(message, remote_ip):
         sys.exit()
 
     print "Socket Connected to " + host + " on ip " + remote_ip
+    
+    message = node_id + "(" +  node_ip + "): " + message
    
     #send some data to remote server
     try:
@@ -73,7 +77,7 @@ def connect_remote(remote_ip):
     print "Socket Created"
     
     host = remote_ip
-    port = 8888
+    port = 3721
     
     try:
         remote_ip = socket.gethostbyname(host)
@@ -93,17 +97,34 @@ def connect_remote(remote_ip):
 
     s.close()
 
-#def clear_history():
+def clear_history(node_id):
+    global HISTORY_PATH
+    history_file = HISTORY_PATH + "/" + node_id
+    os.remove(history_file)    
+
+def update_msg(node_id):
+    global HISTORY_PATH
+    history_file = HISTORY_PATH + "/" + node_id
+    f = open(history_file, 'r') 
+    print f.read()
 
 if __name__ == "__main__":
     if cmd == "send_msg":
         message = form.getvalue('msg')
         remote_ip = form.getvalue('remote_ip')
-        send_message(message, remote_ip)
+        node_ip = form.getvalue('node_ip')
+        node_id = form.getvalue('node_id')
+        send_message(message, remote_ip, node_ip, node_id)
     elif cmd == "close_chat":
         close_chat()
     elif cmd == "connect_remote":
         remote_ip = form.getvalue('remote_ip')
         connect_remote(remote_ip)
+    elif cmd == "clear_history":
+        node_id = form.getvalue('node_id')
+        clear_history(node_id)
+    elif cmd == "get_msg":
+        node_id = form.getvalue('node_id')
+        update_msg(node_id)
         
 
