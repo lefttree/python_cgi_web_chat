@@ -7,13 +7,26 @@ import sys
 import os
 import cgi, cgitb
 
+def idToIP(id):
+   ip = '172.20.'
+   msb = math.floor(int(id)/256)
+   lsb = int(id) - msb * 256
+   ip = ip + msb + lsb
+   return ip
+
 HISTORY_PATH='/tmp/mnt/im_history'
+f = open('/dev/shm/radio/nodeid','r')
+NODEID = f.read()
+f.close()
+NODEIP = idToIP(NODEID)
 
 form = cgi.FieldStorage()
 
 cmd = form.getvalue('cmd')
 
-def send_message(message, remote_ip, node_ip, node_id):
+def send_message(message, remote_ip):
+    global NODEID
+    global NODEIP
     
     #create an AF_INET, STREAM socket(TCP)
     try:
@@ -43,7 +56,7 @@ def send_message(message, remote_ip, node_ip, node_id):
 
     print "Socket Connected to " + host + " on ip " + remote_ip
     
-    message = node_id + "(" +  node_ip + "): " + message
+    message = NODEID + "(" +  NODEIP + "): " + message
    
     #send some data to remote server
     try:
@@ -97,16 +110,17 @@ def connect_remote(remote_ip):
 
     s.close()
 
-def clear_history(node_id):
+def clear_history(remote_node_id):
     global HISTORY_PATH
-    history_file = HISTORY_PATH + "/" + node_id
+    history_file = HISTORY_PATH + "/" + remote_node_id
     os.remove(history_file)    
 
-def update_msg(node_id):
+def update_msg(remote_node_id):
     global HISTORY_PATH
-    history_file = HISTORY_PATH + "/" + node_id
+    history_file = HISTORY_PATH + "/" + remote_node_id
     f = open(history_file, 'r') 
     print f.read()
+    f.close()
 
 if __name__ == "__main__":
     if cmd == "send_msg":
@@ -121,10 +135,10 @@ if __name__ == "__main__":
         remote_ip = form.getvalue('remote_ip')
         connect_remote(remote_ip)
     elif cmd == "clear_history":
-        node_id = form.getvalue('node_id')
-        clear_history(node_id)
+        remote_node_id = form.getvalue('remote_node_id')
+        clear_history(remote_node_id)
     elif cmd == "get_msg":
-        node_id = form.getvalue('node_id')
-        update_msg(node_id)
+        remote_node_id = form.getvalue('remote_node_id')
+        update_msg(remote_node_id)
         
 
