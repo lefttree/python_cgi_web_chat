@@ -12,8 +12,15 @@ def idToIP(id):
    ip = "172.20."
    msb = int(math.floor(int(id)/256))
    lsb = int(int(id) - msb * 256)
-   ip = ip + str(msb) + str(lsb)
+   ip = ip + str(msb) + '.' + str(lsb)
    return ip
+
+def IPToid(ip):
+   ip2 = ip.split('.')[2]
+   ip3 = ip.split('.')[3]
+   id = int(ip2) * 256 + int(ip3)
+   return str(id)
+
 
 HISTORY_PATH='/tmp/mnt/im_history'
 f = open('/dev/shm/radio/nodeid','r')
@@ -57,12 +64,18 @@ def send_message(message, remote_ip):
 
     print "Socket Connected to " + host + " on ip " + remote_ip
     
-    message = NODEID + "(" +  NODEIP + "): " + message
+    s_message = NODEID + "(" +  NODEIP + "): " + message
+    remote_id = IPToid(remote_ip)
+    history_file = HISTORY_PATH + "/" + remote_id
+    f = open(history_file, 'a')
+    his_msg = "<p> me: " + message + "</p>"
+    f.write(his_msg)
+    f.close()
    
     #send some data to remote server
     try:
         #send the whole string
-        s.sendall(message)
+        s.sendall(s_message)
     except socket.error:
         print "send failed"
         sys.exit()
