@@ -5,7 +5,7 @@ function update_message(){
  var remote_node_id = ipToid(ip_input)
  var req = new XMLHttpRequest();
  var d = new Date();
- var reqURL = '/cgi-bin/web_im/chat_util.py?' + d.getTime();
+ var reqURL = '/cgi-bin/web_im/read_msg.sh?remote_node_id=' + remote_node_id + '&_=' + d.getTime();
  req.onreadystatechange = function(){
      if(req.readyState == 4){
          if(req.status == 200){
@@ -16,11 +16,11 @@ function update_message(){
      }
  }
 	
- var formData = new FormData();
- formData.append('cmd', 'get_msg');
- formData.append('remote_node_id', remote_node_id);
- req.open('POST', reqURL, true);
- req.send(formData);
+ //var formData = new FormData();
+ //formData.append('cmd', 'get_msg');
+ //formData.append('remote_node_id', remote_node_id);
+ req.open('GET', reqURL, true);
+ req.send();
 }
 setInterval(update_message, 1000);
 
@@ -108,5 +108,37 @@ function clear_history(){
 	formData.append('remote_node_id', remote_node_id);
      	req.open('POST', reqURL, true);
      	req.send(formData);
+}
+
+/*
+clear all history
+*/
+function clear_all_history(){
+	var req = new XMLHttpRequest(); 
+	var d = new Date();
+     	var reqURL = '/cgi-bin/web_im/chat_util.py?' + d.getTime();
+     	var formData = new FormData();
+	//var node_id = ipToid(ip_input)
+	var remote_node_id = ipToid(ip_input);
+     	formData.append('cmd', 'clear_all_history');
+     	req.open('POST', reqURL, true);
+     	req.send(formData);
+}
+
+/*
+change nickname
+*/
+function change_nickname(){
+	var name = prompt("Please enter your new nickname", "Me");
+	if (name != null) {
+		var req = new XMLHttpRequest(); 
+		var d = new Date();
+		var reqURL = '/cgi-bin/web_im/chat_util.py?' + d.getTime();
+		var formData = new FormData();
+		formData.append('cmd', 'change_nickname');
+		formData.append('nickname', name);
+		req.open('POST', reqURL, true);
+		req.send(formData);
+	}	
 }
 

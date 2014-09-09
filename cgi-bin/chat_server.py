@@ -4,6 +4,7 @@ import socket
 import sys
 import os
 from thread import *
+import json
 
 HISTORY_PATH='/tmp/mnt/im_history'
 
@@ -45,10 +46,12 @@ def clientthread(conn):
             break
         if not os.path.exists(HISTORY_PATH):
             os.makedirs(HISTORY_PATH)
-        node_id = data.split(':')[0].split('(')[0]
+        msg_json = json.loads(data)
+        node_id = msg_json['Nodeid']
+        #node_id = data.split(':')[0].split('(')[0]
         history_file = HISTORY_PATH + "/" + node_id
         f = open(history_file, 'a')
-        data = "<p>" + data + "</p>"
+        data = "<p>" + msg_json['Nickname'] + "(" + msg_json['NodeIP'] + "):" + msg_json['Message'] + "</p>"
         f.write(data)
         f.close()
 

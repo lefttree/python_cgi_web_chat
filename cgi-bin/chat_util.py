@@ -7,6 +7,7 @@ import sys
 import os
 import cgi, cgitb
 import math
+import json
 
 def idToIP(id):
    ip = "172.20."
@@ -28,6 +29,15 @@ NODEID = f.read().splitlines()[0]
 f.close()
 NODEIP = idToIP(NODEID)
 
+NICK_FILE = "/usr/local/cgi-bin/web_im/nickname"
+if os.path.isfile(NICK_FILE):
+    nick_f = open(NICK_FILE, 'r')
+    NICKNAME = nick_f.read().splitlines()[0]
+    nick_f.close()
+else:
+    NICKNAME = NODEID
+
+
 form = cgi.FieldStorage()
 
 cmd = form.getvalue('cmd')
@@ -35,7 +45,7 @@ cmd = form.getvalue('cmd')
 def send_message(message, remote_ip):
     global NODEID
     global NODEIP
-    
+    global NICKNAME
     #create an AF_INET, STREAM socket(TCP)
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -63,8 +73,11 @@ def send_message(message, remote_ip):
         sys.exit()
 
     print "Socket Connected to " + host + " on ip " + remote_ip
-    
-    s_message = NODEID + "(" +  NODEIP + "): " + message
+    #if NICKNAME == "": 
+    s_message = '{ "Nodeid": %s, "NodeIP": %s, "Nickname": %s,"Message": %s}' % (NODEID, NODEIP, NICKNAME, message)
+    #else:
+    #    s_message = NICKNAME + "(" + NODEIP + "): " + message
+
     remote_id = IPToid(remote_ip)
     history_file = HISTORY_PATH + "/" + remote_id
     f = open(history_file, 'a')
@@ -129,12 +142,25 @@ def clear_history(remote_node_id):
     history_file = HISTORY_PATH + "/" + remote_node_id
     os.remove(history_file)    
 
+def clear_all_history():
+    global HISTORY_PATH
+    remove_all_cmd = "rm -rf %s" % HISTORY_PATH
+    os.system(remove_all_cmd)
+
+def change_nickname(nickname):
+    f = open('/usr/local/cgi-bin/web_im/nickname', 'w')  
+    f.write(nickname)
+    f.close()
+
+'''
 def update_msg(remote_node_id):
     global HISTORY_PATH
     history_file = HISTORY_PATH + "/" + remote_node_id
     f = open(history_file, 'r') 
     print f.read()
     f.close()
+    sys.exit()
+'''
 
 if __name__ == "__main__":
     if cmd == "send_msg":
@@ -149,8 +175,10 @@ if __name__ == "__main__":
     elif cmd == "clear_history":
         remote_node_id = form.getvalue('remote_node_id')
         clear_history(remote_node_id)
-    elif cmd == "get_msg":
-        remote_node_id = form.getvalue('remote_node_id')
-        update_msg(remote_node_id)
+    elif cmd == "clear_all_history":
+        clear_all_history()
+    elif cmd == "change_nickname":
+        nickname = form.getvalue('nickname')
+        change_nickname(nickname)
         
 
