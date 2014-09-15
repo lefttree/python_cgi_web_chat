@@ -74,7 +74,7 @@ def send_message(message, remote_ip):
 
     print "Socket Connected to " + host + " on ip " + remote_ip
     #if NICKNAME == "": 
-    s_message = '{ "Nodeid": %s, "NodeIP": %s, "Nickname": %s,"Message": %s}' % (NODEID, NODEIP, NICKNAME, message)
+    s_message = '{ "Nodeid": "%s", "NodeIP": "%s", "Nickname": "%s","Message": "%s" }' % (NODEID, NODEIP, NICKNAME, message)
     #else:
     #    s_message = NICKNAME + "(" + NODEIP + "): " + message
 
